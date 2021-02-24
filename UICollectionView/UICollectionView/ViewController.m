@@ -46,10 +46,10 @@
 
 - (ZYBSelfStudyRoomVideoView *)videoView {
     if (!_videoView) {
+        _videoView = [[ZYBSelfStudyRoomVideoView alloc] initWithFrame:CGRectMake(0, 68, self.view.frame.size.width, self.videoFrame.videoHeight)];
         _videoView.videoHeight = ^(CGFloat height) {
             [self updateFrameWithVideoHeight:height];
         };
-        _videoView = [[ZYBSelfStudyRoomVideoView alloc] initWithFrame:CGRectMake(0, 68, self.view.frame.size.width, self.videoFrame.videoHeight)];
     }
     return _videoView;
 }
@@ -57,7 +57,7 @@
 - (RoomVideoTimeFrame *)videoFrame {
     if (!_videoFrame) {
         _videoFrame = [[RoomVideoTimeFrame alloc] init];
-        _videoFrame.isBig = YES;
+        _videoFrame.isBig = NO;
     }
     return _videoFrame;
 }

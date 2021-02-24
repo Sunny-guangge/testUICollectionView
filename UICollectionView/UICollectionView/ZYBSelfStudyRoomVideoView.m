@@ -95,8 +95,6 @@
 
 @interface ZYBSelfStudyRoomVideoView ()
 
-@property (nonatomic, assign) BOOL isBig;//正在放大某个视频区域
-
 @property (nonatomic, strong) NSMutableArray *data;
 
 @property (nonatomic, strong) RoomVideoTimeFrame *videoFrame;
@@ -115,23 +113,65 @@
 }
 
 - (void)setupUI {
-    self.videoFrame.isBig = YES;
+    self.videoFrame.isBig = NO;
     for (NSInteger i=0; i<self.videoFrame.totalNum; i++) {
         ZYBSelfStudyRoomVideoItemView *itemView = [[ZYBSelfStudyRoomVideoItemView alloc] initWithFrame:[self.videoFrame checkFrameByIndex:i]];
         itemView.index = i;
+        itemView.currentIndex = i;
         itemView.model = [self getModelByIndex:i];
         itemView.clickIndex = ^(NSInteger index) {
-            NSLog(@"%ld",index);
+            [self changeUserIndex:index];
         };
         [self addSubview:itemView];
     }
+}
+
+- (ZYBSelfStudyRoomVideoItemView *)checkItemViewByIndex:(NSInteger)index {
+    for (ZYBSelfStudyRoomVideoItemView *itemView in self.subviews) {
+        if (itemView.currentIndex == index && !itemView.changed) {
+            itemView.changed = YES;
+            return itemView;
+        }
+    }
+    return nil;
+}
+
+//和第一个进行交换
+- (void)changeUserIndex:(NSInteger)index {
+    if (self.videoFrame.isBig) {//正在大图
+        if (index == 0) {//切回去
+            self.videoFrame.isBig = NO;
+            for (ZYBSelfStudyRoomVideoItemView *itemView in self.subviews) {
+                itemView.currentIndex = itemView.index;
+            }
+        }else {//交换位置  0  和   index
+            ZYBSelfStudyRoomVideoItemView *itemView0 = [self checkItemViewByIndex:0];
+            itemView0.currentIndex = index;
+            
+            ZYBSelfStudyRoomVideoItemView *itemViewIndex = [self checkItemViewByIndex:index];
+            itemViewIndex.currentIndex = 0;
+        }
+    }else {
+        self.videoFrame.isBig = YES;
+        ZYBSelfStudyRoomVideoItemView *itemView0 = [self checkItemViewByIndex:0];
+        itemView0.currentIndex = index;
+        
+        ZYBSelfStudyRoomVideoItemView *itemViewIndex = [self checkItemViewByIndex:index];
+        itemViewIndex.currentIndex = 0;
+    }
+    [self refreshItemPosition];
     if (self.videoHeight) {
         self.videoHeight(self.videoFrame.videoHeight);
     }
 }
 
 - (void)refreshItemPosition {
-    
+    [UIView animateWithDuration:0.4 animations:^{
+        for (ZYBSelfStudyRoomVideoItemView *itemView in self.subviews) {
+            itemView.changed = NO;
+            itemView.frame = [self.videoFrame checkFrameByIndex:itemView.currentIndex];
+        }
+    }];
 }
 
 - (Model *)getModelByIndex:(NSInteger )index {
@@ -146,6 +186,7 @@
 - (RoomVideoTimeFrame *)videoFrame {
     if (!_videoFrame) {
         _videoFrame = [[RoomVideoTimeFrame alloc] init];
+        _videoFrame.isBig = NO;
     }
     return _videoFrame;
 }

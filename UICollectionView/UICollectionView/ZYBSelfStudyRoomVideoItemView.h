@@ -19,6 +19,8 @@ typedef void(^clickIndex)(NSInteger index);
 
 @property (nonatomic, assign) NSInteger currentIndex;//放大之后的位置
 
+@property (nonatomic, assign) BOOL changed;
+
 @property (nonatomic, copy) clickIndex clickIndex;
 
 @end

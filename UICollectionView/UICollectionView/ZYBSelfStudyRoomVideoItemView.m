@@ -19,6 +19,7 @@
 @property (nonatomic, strong) UIView *renderView;
 @property (nonatomic, strong) UIImageView *blankImageView;
 @property (nonatomic, strong) UIButton *clickButton;
+@property (nonatomic, strong) UILabel *indexLabel;
 
 @end
 
@@ -31,19 +32,6 @@
     }
     return self;
 }
-
-//- (void)layoutSubviews {
-//    [super layoutSubviews];
-//
-//    self.allView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-//    self.renderView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-//    self.blankImageView.frame = CGRectMake(self.frame.size.width / 2 - 29, self.frame.size.height / 2 - 27.5, 58, 55);
-//    self.titleImageView.frame = CGRectMake(8, 8, 32, 18);
-//    self.backView.frame = CGRectMake(8, self.frame.size.height - 26, 74, 20);
-//    self.avatarImageView.frame = CGRectMake(0, 0, 20, 20);
-//    self.timeLabel.frame = CGRectMake(20, 0, 54, 20);
-//    self.clickButton.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-//}
 
 - (void)setupUI {
     [self addSubview:self.allView];
@@ -92,6 +80,11 @@
         make.right.top.bottom.equalTo(self.backView);
     }];
     
+    [self.allView addSubview:self.indexLabel];
+    [self.indexLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.mas_equalTo(UIEdgeInsetsZero);
+    }];
+    
     [self.allView addSubview:self.clickButton];
     [self.clickButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.mas_equalTo(UIEdgeInsetsZero);
@@ -108,10 +101,15 @@
     self.timeLabel.text = [self getMMSSFromSS:model.time];
 }
 
+- (void)setCurrentIndex:(NSInteger)currentIndex {
+    _currentIndex = currentIndex;
+    self.indexLabel.text = [NSString stringWithFormat:@"%ld",currentIndex];
+}
+
 - (void)clickCurrentView {
     if (self.model.time) {
         if (self.clickIndex) {
-            self.clickIndex(self.index);
+            self.clickIndex(self.currentIndex);
         }
     }
 }
@@ -196,6 +194,16 @@
         _timeLabel.font = [UIFont systemFontOfSize:10];
     }
     return _timeLabel;
+}
+
+- (UILabel *)indexLabel{
+    if (!_indexLabel) {
+        _indexLabel = [[UILabel alloc] init];
+        _indexLabel.textColor = [UIColor redColor];
+        _indexLabel.textAlignment = NSTextAlignmentCenter;
+        _indexLabel.font = [UIFont systemFontOfSize:20];
+    }
+    return _indexLabel;
 }
 
 - (UIButton *)clickButton {
